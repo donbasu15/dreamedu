@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_FLAGS = "--shamefully-hoist"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Environment Variables needed in Netlify:
+# TURSO_DATABASE_URL
+# TURSO_AUTH_TOKEN
+# NEXTAUTH_SECRET
+# NEXTAUTH_URL (The URL of your Netlify site)
+# AUTH_TRUST_HOST=true
