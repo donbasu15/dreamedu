@@ -34,7 +34,7 @@ export default async function NoteContentPage({ params }: { params: Promise<{ id
               </span>
             )}
             <span className="text-sm text-slate-500">
-              Published on {new Date(note.createdAt).toLocaleDateString()}
+              Published on {new Date(note.createdAt).toLocaleDateString()} by <span className="font-semibold">{note.creatorName || "DreamEdu Team"}</span>
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">

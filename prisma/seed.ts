@@ -31,6 +31,44 @@ async function main() {
     },
   });
 
+  const category = await prisma.category.upsert({
+    where: { id: 'default-cat' },
+    update: {},
+    create: {
+      id: 'default-cat',
+      name: 'General',
+    },
+  });
+
+  await prisma.note.createMany({
+    data: [
+      { title: 'Class 10 Math Basics', content: 'Basic math notes for class 10', level: 'Class 10', creatorName: 'Admin User' },
+      { title: 'Class 12 Physics', content: 'Physics notes for class 12', level: 'Class 12', creatorName: 'Admin User' },
+      { title: 'Class 10 Science', content: 'Science notes for class 10', level: 'Class 10', creatorName: 'Admin User' },
+    ],
+  });
+
+  await prisma.test.create({
+    data: {
+      title: 'Class 10 Algebra Quiz',
+      level: 'Class 10',
+      creatorName: 'Admin User',
+      categoryId: category.id,
+      questions: {
+        create: [
+          {
+            content: 'What is x in 2x = 4?',
+            optionA: '1',
+            optionB: '2',
+            optionC: '3',
+            optionD: '4',
+            correctOption: 'B',
+          }
+        ]
+      }
+    }
+  });
+
   console.log("Database seeded successfully.");
 }
 

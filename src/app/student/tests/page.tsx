@@ -2,8 +2,22 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { FiClock, FiLock, FiCheckCircle } from "react-icons/fi";
 
-export default async function StudentTestsPage() {
+import SearchFilter from "@/components/SearchFilter";
+
+export default async function StudentTestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; level?: string }>;
+}) {
+  const { search, level } = await searchParams;
+
   const tests = await prisma.test.findMany({
+    where: {
+      AND: [
+        ...(search ? [{ title: { contains: search } }] : []),
+        ...(level ? [{ level }] : []),
+      ],
+    },
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { questions: true } } },
   });
@@ -14,6 +28,8 @@ export default async function StudentTestsPage() {
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Test Series</h1>
         <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">Challenge yourself with dynamic quizzes and full-length mock tests.</p>
       </div>
+
+      <SearchFilter placeholder="Search tests by title..." />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tests.map((test: any) => (
@@ -32,7 +48,10 @@ export default async function StudentTestsPage() {
                </div>
             )}
             <div className="mt-2">
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/30">
+                  {test.level || "General"}
+                </span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${test.type === 'Mock' ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200'}`}>
                   {test.type}
                 </span>
@@ -46,6 +65,9 @@ export default async function StudentTestsPage() {
               <h3 className="text-xl font-bold text-slate-900 dark:text-white line-clamp-2 mb-2">
                 {test.title}
               </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium italic mb-1">
+                By {test.creatorName || "DreamEdu Team"}
+              </p>
             </div>
             
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -58,7 +80,7 @@ export default async function StudentTestsPage() {
         
         {tests.length === 0 && (
           <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-            No tests have been published yet. Please check back later.
+            {search || level ? "No tests matching your search or filters." : "No tests have been published yet. Please check back later."}
           </div>
         )}
       </div>
