@@ -23,7 +23,7 @@ model Note {
   id          String   @id @default(cuid())
   title       String
   content     String
-  level       String?
+  categoryName String?
   isPremium   Boolean  @default(false)
   creatorName String?
   createdAt   DateTime @default(now())
@@ -39,7 +39,7 @@ model Category {
 model Test {
   id              String     @id @default(cuid())
   title           String
-  level           String?
+  categoryName    String?
   creatorName     String?
   categoryId      String?
   durationMinutes Int        @default(30)
@@ -49,7 +49,7 @@ model Test {
   updatedAt       DateTime   @updatedAt
   questions       Question[]
   results         Result[]
-  category        Category?  @relation(fields: [categoryId], references: [id])
+  categoryRef     Category?  @relation(fields: [categoryId], references: [id])
 }
 
 model Question {

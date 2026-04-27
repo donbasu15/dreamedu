@@ -11,7 +11,7 @@ export default async function EditTestPage({ params }: { params: Promise<{ id: s
   if (!test) {
     return notFound();
   }
-  const normalizedTest = { ...test, level: test.level ?? undefined };
+  const normalizedTest = { ...test, category: test.categoryName ?? undefined };
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="space-y-2">

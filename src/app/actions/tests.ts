@@ -5,13 +5,13 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export async function createTest(data: { title: string; categoryId?: string; level: string; durationMinutes: number; type: string; isPremium: boolean }) {
+export async function createTest(data: { title: string; categoryId?: string; category: string; durationMinutes: number; type: string; isPremium: boolean }) {
   const session = await getServerSession(authOptions);
 
   const test = await prisma.test.create({
     data: {
       title: data.title,
-      level: data.level,
+      categoryName: data.category,
       durationMinutes: data.durationMinutes,
       type: data.type,
       isPremium: data.isPremium,
@@ -25,10 +25,16 @@ export async function createTest(data: { title: string; categoryId?: string; lev
   return test;
 }
 
-export async function updateTest(id: string, data: { title?: string; level?: string; durationMinutes?: number; type?: string; isPremium?: boolean }) {
+export async function updateTest(id: string, data: { title?: string; category?: string; durationMinutes?: number; type?: string; isPremium?: boolean }) {
   const test = await prisma.test.update({
     where: { id },
-    data,
+    data: {
+      title: data.title,
+      categoryName: data.category,
+      durationMinutes: data.durationMinutes,
+      type: data.type,
+      isPremium: data.isPremium,
+    },
   });
  
   revalidatePath("/admin/tests");

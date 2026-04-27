@@ -7,15 +7,16 @@ import SearchFilter from "@/components/SearchFilter";
 export default async function StudentNotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; level?: string }>;
+  searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const { search, level } = await searchParams;
+  const { search, category } = await searchParams;
+  console.log("DEBUG: StudentNotesPage running with category:", category);
 
   const notes = await prisma.note.findMany({
     where: {
       AND: [
         ...(search ? [{ title: { contains: search } }] : []),
-        ...(level ? [{ level }] : []),
+        ...(category ? [{ categoryName: { equals: category } }] : []),
       ],
     },
     orderBy: { createdAt: "desc" },
@@ -44,7 +45,7 @@ export default async function StudentNotesPage({
                     <FiBook className="h-5 w-5" />
                   </div>
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                    {note.level || "General"}
+                    {note.categoryName || "General"}
                   </span>
                 </div>
                 {note.isPremium && (
@@ -75,7 +76,7 @@ export default async function StudentNotesPage({
         
         {notes.length === 0 && (
           <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-            {search || level ? "No notes matching your search or filters." : "No notes have been published yet. Please check back later."}
+            {search || category ? "No notes matching your search or filters." : "No notes have been published yet. Please check back later."}
           </div>
         )}
       </div>

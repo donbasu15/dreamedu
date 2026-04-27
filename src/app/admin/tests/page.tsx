@@ -10,19 +10,19 @@ import SearchFilter from "@/components/SearchFilter";
 export default async function AdminTestsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; level?: string }>;
+  searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const { search, level } = await searchParams;
+  const { search, category } = await searchParams;
 
   const tests = await prisma.test.findMany({
     where: {
       AND: [
         ...(search ? [{ title: { contains: search } }] : []),
-        ...(level ? [{ level }] : []),
+        ...(category ? [{ categoryName: { equals: category } }] : []),
       ],
     },
     orderBy: { createdAt: "desc" },
-    include: { category: true, _count: { select: { questions: true } } },
+    include: { _count: { select: { questions: true } } },
   });
 
   return (
@@ -46,8 +46,8 @@ export default async function AdminTestsPage({
           <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
             <thead className="bg-slate-50 dark:bg-slate-800/50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Test Details</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Level</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Title</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Category</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Type / Duration</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Questions</th>
                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
@@ -60,12 +60,11 @@ export default async function AdminTestsPage({
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-slate-900 dark:text-white truncate max-w-[150px] sm:max-w-xs">{test.title}</span>
                       <span className="text-[10px] text-slate-600 dark:text-slate-300 font-medium italic">By {test.creatorName || "N/A"}</span>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400">{test.category?.name || "Uncategorized"}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
-                    <div className="text-[10px] sm:text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded w-max border border-amber-100 dark:border-amber-900/30">
-                      {test.level || "N/A"}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-[10px] sm:text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded w-max border border-blue-100 dark:border-blue-900/30">
+                      {test.categoryName || "Uncategorized"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
@@ -94,8 +93,8 @@ export default async function AdminTestsPage({
               ))}
               {tests.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
-                    {search || level ? "No tests matching your filters." : "No tests available. Create the first one!"}
+                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
+                    {search || category ? "No tests matching your filters." : "No tests found. Create your first one."}
                   </td>
                 </tr>
               )}

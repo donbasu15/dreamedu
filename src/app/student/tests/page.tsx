@@ -7,15 +7,15 @@ import SearchFilter from "@/components/SearchFilter";
 export default async function StudentTestsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; level?: string }>;
+  searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const { search, level } = await searchParams;
+  const { search, category } = await searchParams;
 
   const tests = await prisma.test.findMany({
     where: {
       AND: [
         ...(search ? [{ title: { contains: search } }] : []),
-        ...(level ? [{ level }] : []),
+        ...(category ? [{ categoryName: { equals: category } }] : []),
       ],
     },
     orderBy: { createdAt: "desc" },
@@ -50,7 +50,7 @@ export default async function StudentTestsPage({
             <div className="mt-2">
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/30">
-                  {test.level || "General"}
+                  {test.categoryName || "General"}
                 </span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${test.type === 'Mock' ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200'}`}>
                   {test.type}
@@ -80,7 +80,7 @@ export default async function StudentTestsPage({
         
         {tests.length === 0 && (
           <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-            {search || level ? "No tests matching your search or filters." : "No tests have been published yet. Please check back later."}
+            {search || category ? "No tests matching your search or filters." : "No tests have been published yet. Please check back later."}
           </div>
         )}
       </div>

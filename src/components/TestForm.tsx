@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { createTest, updateTest } from "@/app/actions/tests";
 import { useRouter } from "next/navigation";
+import CategorySelector from "./CategorySelector";
 
 interface TestFormProps {
   initialData?: {
     id: string;
     title: string;
-    level?: string;
+    category?: string;
     durationMinutes: number;
     type: string;
     isPremium: boolean;
@@ -18,7 +19,7 @@ interface TestFormProps {
 export default function TestForm({ initialData }: TestFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialData?.title || "");
-  const [level, setLevel] = useState(initialData?.level || "");
+  const [category, setCategory] = useState(initialData?.category || "");
   const [durationMinutes, setDurationMinutes] = useState(initialData?.durationMinutes || 30);
   const [type, setType] = useState(initialData?.type || "Quiz");
   const [isPremium, setIsPremium] = useState(initialData?.isPremium || false);
@@ -26,14 +27,14 @@ export default function TestForm({ initialData }: TestFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title || !level) return;
+    if (!title || !category) return;
     setLoading(true);
 
     try {
       if (initialData) {
-        await updateTest(initialData.id, { title, level, durationMinutes, type, isPremium });
+        await updateTest(initialData.id, { title, category, durationMinutes, type, isPremium });
       } else {
-        await createTest({ title, level, durationMinutes, type, isPremium });
+        await createTest({ title, category, durationMinutes, type, isPremium });
       }
       router.push("/admin/tests");
     } catch (error) {
@@ -64,32 +65,15 @@ export default function TestForm({ initialData }: TestFormProps) {
           </div>
         </div>
 
-        <div>
-           <label htmlFor="level" className="block text-sm font-medium leading-6 text-slate-900 dark:text-white">
-            Target Level / Class
+        <div className="relative z-30">
+           <label htmlFor="category" className="block text-sm font-medium leading-6 text-slate-900 dark:text-white">
+            Category
           </label>
           <div className="mt-2">
-            <select
-              id="level"
-              name="level"
-              required
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
-              className="block w-full rounded-md border-0 py-2 px-3 text-slate-900 dark:text-white dark:bg-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-            >
-              <option value="">Select Level</option>
-              <option value="Class 4">Class 4</option>
-              <option value="Class 5">Class 5</option>
-              <option value="Class 6">Class 6</option>
-              <option value="Class 7">Class 7</option>
-              <option value="Class 8">Class 8</option>
-              <option value="Class 9">Class 9</option>
-              <option value="Class 10">Class 10</option>
-              <option value="Class 11">Class 11</option>
-              <option value="Class 12">Class 12</option>
-              <option value="Degree">Degree</option>
-              <option value="Others">Others</option>
-            </select>
+            <CategorySelector
+              selected={category}
+              onChange={setCategory}
+            />
           </div>
         </div>
       </div>

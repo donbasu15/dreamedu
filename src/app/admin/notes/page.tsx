@@ -9,15 +9,15 @@ import SearchFilter from "@/components/SearchFilter";
 export default async function AdminNotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; level?: string }>;
+  searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const { search, level } = await searchParams;
+  const { search, category } = await searchParams;
 
   const notes = await prisma.note.findMany({
     where: {
       AND: [
         ...(search ? [{ title: { contains: search } }] : []),
-        ...(level ? [{ level }] : []),
+        ...(category ? [{ categoryName: { equals: category } }] : []),
       ],
     },
     orderBy: { createdAt: "desc" },
@@ -43,7 +43,7 @@ export default async function AdminNotesPage({
             <thead className="bg-slate-50 dark:bg-slate-800/50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Title</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Level</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Category</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Creator</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Created</th>
@@ -58,7 +58,7 @@ export default async function AdminNotesPage({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-[10px] sm:text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded w-max border border-blue-100 dark:border-blue-900/30">
-                      {note.level || "N/A"}
+                      {note.categoryName || "N/A"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
@@ -85,7 +85,7 @@ export default async function AdminNotesPage({
               {notes.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
-                    {search || level ? "No notes matching your filters." : "No notes found. Create your first one."}
+                    {search || category ? "No notes matching your filters." : "No notes found. Create your first one."}
                   </td>
                 </tr>
               )}
