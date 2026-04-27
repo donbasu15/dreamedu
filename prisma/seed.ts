@@ -42,16 +42,15 @@ async function main() {
 
   await prisma.note.createMany({
     data: [
-      { title: 'Class 10 Math Basics', content: 'Basic math notes for class 10', categoryNameFixed: 'Class 10', creatorName: 'Admin User' },
-      { title: 'Class 12 Physics', content: 'Physics notes for class 12', categoryNameFixed: 'Class 12', creatorName: 'Admin User' },
-      { title: 'Class 10 Science', content: 'Science notes for class 10', categoryNameFixed: 'Class 10', creatorName: 'Admin User' },
+      { title: 'Class 10 Math Basics', content: 'Basic math notes for class 10', creatorName: 'Admin User' },
+      { title: 'Class 12 Physics', content: 'Physics notes for class 12', creatorName: 'Admin User' },
+      { title: 'Class 10 Science', content: 'Science notes for class 10', creatorName: 'Admin User' },
     ],
   });
 
   await prisma.test.create({
     data: {
       title: 'Class 10 Algebra Quiz',
-      categoryNameFixed: 'Class 10',
       creatorName: 'Admin User',
       categoryId: category.id,
       questions: {
