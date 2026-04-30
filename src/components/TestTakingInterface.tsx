@@ -68,17 +68,23 @@ export default function TestTakingInterface({ test }: { test: TestData }) {
     
     setSubmitted({ score, total: totalScore });
 
+    console.log("Attempting to submit result for user:", session?.user?.id);
     if (session?.user?.id) {
        try {
-         await submitTestResult({
+         console.log("Submitting with answers:", answers);
+         const res = await submitTestResult({
            studentId: session.user.id,
            testId: test.id,
            score,
-           totalScore
+           totalScore,
+           answersData: answers
          });
+         console.log("Submission response:", res);
        } catch (error) {
-         console.error("Failed to save result:", error);
+         console.error("Failed to save result frontend error:", error);
        }
+    } else {
+       console.warn("No user ID found in session during submission");
     }
     
     setIsSubmitting(false);
@@ -92,14 +98,14 @@ export default function TestTakingInterface({ test }: { test: TestData }) {
           {submitted.score} <span className="text-3xl text-blue-600/60 dark:text-blue-400/60 break-words">/ {submitted.total}</span>
         </div>
         <p className="text-slate-600 dark:text-slate-400 mb-8">
-          Your result has been recorded. Check the leaderboard to see how you rank against others.
+          Your result has been recorded. You can now review your answers and check the leaderboard.
         </p>
         <div className="flex justify-center gap-4">
            <button onClick={() => router.push("/student/tests")} className="px-6 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium rounded-lg transition-colors">
               Back to Tests
            </button>
-           <button onClick={() => router.push("/student/leaderboard")} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm cursor-pointer">
-              View Leaderboard
+           <button onClick={() => window.location.reload()} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm cursor-pointer">
+              Review & Leaderboard
            </button>
         </div>
       </div>

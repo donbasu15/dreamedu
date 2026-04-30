@@ -14,12 +14,20 @@ export default function Header() {
     { name: "Home", href: "/" },
     { name: "Notes", href: "/student/notes" },
     { name: "Test Series", href: "/student/tests" },
-    { name: "Leaderboard", href: "/student/leaderboard" },
   ];
 
-  if (session?.user.role === "ADMIN") {
+  if (session?.user?.role === "ADMIN") {
     navLinks.push({ name: "Admin Panel", href: "/admin" });
   }
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return "??";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
+  };
 
   return (
     <header className="bg-card text-card-foreground border-b border-border sticky top-0 z-50 shadow-sm transition-colors duration-300">
@@ -50,13 +58,23 @@ export default function Header() {
             {status === "loading" ? (
               <div className="h-8 w-20 bg-slate-200 dark:bg-slate-800 animate-pulse rounded"></div>
             ) : session ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-slate-700 dark:text-slate-200 font-medium">
-                  {session.user.name || session.user.email}
-                </span>
+              <div className="flex items-center space-x-5">
+                <Link href="/profile" className="flex items-center group">
+                   <div className="h-10 w-10 rounded-xl bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-sm font-bold shadow-md group-hover:shadow-blue-500/20 group-hover:scale-105 transition-all duration-300 ring-2 ring-white dark:ring-slate-900 ring-offset-2 ring-offset-transparent group-hover:ring-blue-400">
+                      {getInitials(session.user.name || session.user.email)}
+                   </div>
+                   <div className="ml-3 hidden lg:block">
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {session.user.name?.split(' ')[0] || session.user.email?.split('@')[0]}
+                      </p>
+                      <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                        {session.user.role}
+                      </p>
+                   </div>
+                </Link>
                 <button
                   onClick={() => signOut()}
-                  className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-200 hover:text-red-600 dark:hover:text-red-400 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 border border-transparent hover:border-red-200 dark:hover:border-red-800"
                 >
                   Sign Out
                 </button>
@@ -107,13 +125,23 @@ export default function Header() {
             {status === "loading" ? (
                <div className="px-5 h-8 bg-slate-200 dark:bg-slate-800 animate-pulse rounded w-1/2"></div>
             ) : session ? (
-              <div className="px-5 space-y-3">
-                <div className="text-base font-medium text-slate-800 dark:text-slate-200">
-                  {session.user.name || session.user.email}
-                </div>
+              <div className="px-5 py-2">
+                <Link href="/profile" className="flex items-center gap-4 group mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-lg font-bold shadow-lg">
+                    {getInitials(session.user.name || session.user.email)}
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-slate-900 dark:text-white">
+                      {session.user.name || session.user.email?.split('@')[0]}
+                    </p>
+                    <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+                      {session.user.role} Account
+                    </p>
+                  </div>
+                </Link>
                 <button
                   onClick={() => signOut()}
-                  className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900"
+                  className="w-full text-center py-3 rounded-xl text-base font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 active:scale-95 transition-all"
                 >
                   Sign Out
                 </button>

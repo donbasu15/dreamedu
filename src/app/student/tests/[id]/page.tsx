@@ -4,10 +4,18 @@ import TestTakingInterface from "@/components/TestTakingInterface";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { FiLock } from "react-icons/fi";
+import { FiLock, FiCheckCircle } from "react-icons/fi";
+import TestReviewInterface from "@/components/TestReviewInterface";
 
-export default async function TestPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TestPage({ 
+  params,
+  searchParams,
+}: { 
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ review?: string }>;
+}) {
   const { id } = await params;
+  const { review } = await searchParams;
   const session = await getServerSession(authOptions);
 
   const test = await prisma.test.findUnique({
@@ -36,6 +44,67 @@ export default async function TestPage({ params }: { params: Promise<{ id: strin
         >
           Sign In to Start <span className="ml-2 group-hover:translate-x-1 inline-block transition-transform">→</span>
         </Link>
+      </div>
+    );
+  }
+
+  const existingResult = await prisma.result.findFirst({
+    where: {
+      testId: id,
+      studentId: session.user.id,
+    },
+  });
+
+  if (existingResult) {
+    let parsedAnswers = {};
+    if (existingResult.answersData) {
+      try {
+        parsedAnswers = JSON.parse(existingResult.answersData);
+      } catch(e) {}
+    }
+
+    // Leaderboard logic: Previous Week (Monday to Sunday)
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysToLastSunday = dayOfWeek === 0 ? 7 : dayOfWeek;
+    
+    const lastSunday = new Date(now);
+    lastSunday.setDate(now.getDate() - daysToLastSunday);
+    lastSunday.setHours(23, 59, 59, 999);
+    
+    const lastMonday = new Date(lastSunday);
+    lastMonday.setDate(lastSunday.getDate() - 6);
+    lastMonday.setHours(0, 0, 0, 0);
+
+    const dateOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    const weekString = `${lastMonday.toLocaleDateString(undefined, dateOptions)} - ${lastSunday.toLocaleDateString(undefined, dateOptions)}`;
+
+    const topResults = await prisma.result.findMany({
+      where: {
+        testId: id,
+        submittedAt: {
+          gte: lastMonday,
+          lte: lastSunday
+        }
+      },
+      take: 10,
+      orderBy: [
+        { score: "desc" },
+        { submittedAt: "asc" }
+      ],
+      include: { student: true },
+    });
+    
+    return (
+      <div className="pt-4">
+        <TestReviewInterface 
+          test={test} 
+          answers={parsedAnswers} 
+          score={existingResult.score}
+          totalScore={existingResult.totalScore}
+          leaderboard={topResults}
+          weekString={weekString}
+        />
       </div>
     );
   }

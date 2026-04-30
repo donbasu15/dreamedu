@@ -9,14 +9,23 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String?
-  email        String   @unique
-  passwordHash String
-  role         String   @default("STUDENT")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  results      Result[]
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique
+  passwordHash     String
+  role             String    @default("STUDENT")
+  currentInstitution String?
+  gradeOrClass     String?
+  phone            String?
+  address          String?
+  emailVerified    DateTime?
+  otp              String?
+  otpExpiry        DateTime?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  results          Result[]
 }
 
 model Note {
@@ -73,6 +82,7 @@ model Result {
   score       Int      @default(0)
   totalScore  Int      @default(0)
   submittedAt DateTime @default(now())
-  test        Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  answersData String?
+  test         Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
   student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

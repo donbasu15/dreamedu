@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { FiClock, FiLock, FiCheckCircle } from "react-icons/fi";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 import SearchFilter from "@/components/SearchFilter";
 
@@ -21,6 +23,16 @@ export default async function StudentTestsPage({
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { questions: true } } },
   });
+
+  const session = await getServerSession(authOptions);
+  const userResults = session?.user?.id
+    ? await prisma.result.findMany({
+        where: { studentId: session.user.id },
+        select: { testId: true, score: true, totalScore: true }
+      })
+    : [];
+    
+  const completedTestMap = new Map(userResults.map((r: any) => [r.testId, r]));
 
   return (
     <div className="space-y-8">
@@ -71,9 +83,15 @@ export default async function StudentTestsPage({
             </div>
             
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-               <Link href={`/student/tests/${test.id}`} className="block w-full text-center bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-lg font-medium transition-colors">
-                  Start Test
-               </Link>
+               {completedTestMap.get(test.id) ? (
+                 <Link href={`/student/tests/${test.id}?review=true`} className="block w-full text-center bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/30 hover:bg-green-100 dark:hover:bg-green-900/40 py-2 rounded-lg font-medium transition-colors">
+                    Completed: {completedTestMap.get(test.id)?.score}/{completedTestMap.get(test.id)?.totalScore}
+                 </Link>
+               ) : (
+                 <Link href={`/student/tests/${test.id}`} className="block w-full text-center bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-lg font-medium transition-colors">
+                    Start Test
+                 </Link>
+               )}
             </div>
           </div>
         ))}

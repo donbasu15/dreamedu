@@ -17,9 +17,9 @@ export default function Home() {
     },
     {
       name: "Weekly Leaderboard",
-      description: "Compete with peers and check your ranking on our weekly leaderboard.",
+      description: "Compete with peers and check your ranking on our weekly leaderboard after completing tests.",
       icon: FiAward,
-      href: "/student/leaderboard"
+      href: "/student/tests"
     }
   ];
 
