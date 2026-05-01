@@ -88,7 +88,7 @@ export default function SignUpPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-semibold leading-6 text-slate-900 dark:text-slate-200 ml-1">
-                Password
+                Create Your Password
               </label>
               <div className="mt-2">
                 <input
