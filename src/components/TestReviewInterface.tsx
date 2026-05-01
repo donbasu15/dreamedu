@@ -142,7 +142,7 @@ export default function TestReviewInterface({
             </div>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Weekly Leaderboard</h2>
             <p className="text-slate-600 dark:text-slate-300">
-              Showing top results for this week.
+              Showing top results for the previous week.
             </p>
             {weekString && (
               <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full font-medium text-sm">

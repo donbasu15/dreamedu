@@ -63,28 +63,28 @@ export default async function TestPage({
       } catch(e) {}
     }
 
-    // Leaderboard logic: Current Week (Monday to Sunday)
+    // Leaderboard logic: Previous Week (Monday to Sunday)
     const now = new Date();
     const dayOfWeek = now.getDay(); // 0 is Sunday, 1 is Monday
     const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     
-    const thisMonday = new Date(now);
-    thisMonday.setDate(now.getDate() - daysSinceMonday);
-    thisMonday.setHours(0, 0, 0, 0);
+    const previousMonday = new Date(now);
+    previousMonday.setDate(now.getDate() - daysSinceMonday - 7);
+    previousMonday.setHours(0, 0, 0, 0);
     
-    const thisSunday = new Date(thisMonday);
-    thisSunday.setDate(thisMonday.getDate() + 6);
-    thisSunday.setHours(23, 59, 59, 999);
+    const previousSunday = new Date(previousMonday);
+    previousSunday.setDate(previousMonday.getDate() + 6);
+    previousSunday.setHours(23, 59, 59, 999);
 
     const dateOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-    const weekString = `${thisMonday.toLocaleDateString(undefined, dateOptions)} - ${thisSunday.toLocaleDateString(undefined, dateOptions)}`;
+    const weekString = `${previousMonday.toLocaleDateString(undefined, dateOptions)} - ${previousSunday.toLocaleDateString(undefined, dateOptions)}`;
 
     const topResults = await prisma.result.findMany({
       where: {
         testId: id,
         submittedAt: {
-          gte: thisMonday,
-          lte: thisSunday
+          gte: previousMonday,
+          lte: previousSunday
         }
       },
       take: 10,
