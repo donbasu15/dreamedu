@@ -79,13 +79,20 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        // Fetch role from DB if it's a new sign in or Google login
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
-        token.role = dbUser?.role || "STUDENT";
-        token.id = dbUser?.id || user.id;
       }
+      
+      // Always fetch latest role and ID from DB to ensure session reflects backend changes
+      if (token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+          select: { id: true, role: true }
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.id = dbUser.id;
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {

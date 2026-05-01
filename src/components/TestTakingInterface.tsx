@@ -65,8 +65,6 @@ export default function TestTakingInterface({ test }: { test: TestData }) {
     setIsSubmitting(true);
     const score = calculateScore();
     const totalScore = test.questions.length;
-    
-    setSubmitted({ score, total: totalScore });
 
     console.log("Attempting to submit result for user:", session?.user?.id);
     if (session?.user?.id) {
@@ -87,6 +85,7 @@ export default function TestTakingInterface({ test }: { test: TestData }) {
        console.warn("No user ID found in session during submission");
     }
     
+    setSubmitted({ score, total: totalScore });
     setIsSubmitting(false);
   };
 

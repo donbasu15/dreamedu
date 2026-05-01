@@ -63,28 +63,28 @@ export default async function TestPage({
       } catch(e) {}
     }
 
-    // Leaderboard logic: Previous Week (Monday to Sunday)
+    // Leaderboard logic: Current Week (Monday to Sunday)
     const now = new Date();
-    const dayOfWeek = now.getDay();
-    const daysToLastSunday = dayOfWeek === 0 ? 7 : dayOfWeek;
+    const dayOfWeek = now.getDay(); // 0 is Sunday, 1 is Monday
+    const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     
-    const lastSunday = new Date(now);
-    lastSunday.setDate(now.getDate() - daysToLastSunday);
-    lastSunday.setHours(23, 59, 59, 999);
+    const thisMonday = new Date(now);
+    thisMonday.setDate(now.getDate() - daysSinceMonday);
+    thisMonday.setHours(0, 0, 0, 0);
     
-    const lastMonday = new Date(lastSunday);
-    lastMonday.setDate(lastSunday.getDate() - 6);
-    lastMonday.setHours(0, 0, 0, 0);
+    const thisSunday = new Date(thisMonday);
+    thisSunday.setDate(thisMonday.getDate() + 6);
+    thisSunday.setHours(23, 59, 59, 999);
 
     const dateOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-    const weekString = `${lastMonday.toLocaleDateString(undefined, dateOptions)} - ${lastSunday.toLocaleDateString(undefined, dateOptions)}`;
+    const weekString = `${thisMonday.toLocaleDateString(undefined, dateOptions)} - ${thisSunday.toLocaleDateString(undefined, dateOptions)}`;
 
     const topResults = await prisma.result.findMany({
       where: {
         testId: id,
         submittedAt: {
-          gte: lastMonday,
-          lte: lastSunday
+          gte: thisMonday,
+          lte: thisSunday
         }
       },
       take: 10,
