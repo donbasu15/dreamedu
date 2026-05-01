@@ -1,10 +1,15 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.CLIENT_ID!,
+      clientSecret: process.env.CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -19,7 +24,7 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user || !(await bcrypt.compare(credentials.password, user.passwordHash))) {
+        if (!user || !user.passwordHash || !(await bcrypt.compare(credentials.password, user.passwordHash))) {
           throw new Error("Invalid credentials");
         }
 
@@ -37,10 +42,49 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      console.log("NextAuth signIn callback triggered for provider:", account?.provider);
+      if (account?.provider === "google") {
+        if (!user.email) {
+          console.error("Google sign-in failed: No email provided in profile");
+          return false;
+        }
+
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (!existingUser) {
+            console.log("Creating new user for Google account:", user.email);
+            await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name,
+                emailVerified: new Date(),
+                role: "STUDENT",
+              },
+            });
+            console.log("New Google user created successfully");
+          } else {
+            console.log("Existing user found for Google account:", user.email);
+          }
+        } catch (error) {
+          console.error("Database error during Google sign-in:", error);
+          return false;
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        // Fetch role from DB if it's a new sign in or Google login
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
+        token.role = dbUser?.role || "STUDENT";
+        token.id = dbUser?.id || user.id;
       }
       return token;
     },

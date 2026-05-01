@@ -35,8 +35,17 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="text-2xl font-bold text-blue-700 dark:text-blue-400 tracking-tight">
-              DreamEdu
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-2 ring-blue-100 dark:ring-blue-900/50 group-hover:ring-blue-400 transition-all">
+                <img 
+                  src="/profile.png" 
+                  alt="DreamEdu Logo" 
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                DreamEdu
+              </span>
             </Link>
           </div>
 

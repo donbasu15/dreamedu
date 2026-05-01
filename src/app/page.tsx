@@ -27,6 +27,15 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center space-y-16 py-12">
       {/* Hero Section */}
       <section className="text-center space-y-6 max-w-3xl">
+        <div className="flex justify-center mb-8">
+          <div className="relative w-24 h-24 rounded-3xl overflow-hidden ring-4 ring-blue-100 dark:ring-blue-900/50 shadow-2xl shadow-blue-500/20 animate-in fade-in zoom-in duration-1000">
+            <img 
+              src="/profile.png" 
+              alt="DreamEdu Logo" 
+              className="object-cover w-full h-full"
+            />
+          </div>
+        </div>
         <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-6xl">
           Welcome to <span className="text-blue-600 dark:text-blue-400">DreamEdu</span> Classes
         </h1>
