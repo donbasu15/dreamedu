@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { FiUsers, FiFileText, FiEdit3, FiActivity } from "react-icons/fi";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
   const userCount = await prisma.user.count();
   const noteCount = await prisma.note.count();
